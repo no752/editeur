@@ -1,0 +1,33 @@
+body {  
+    font-family : monospace, sans-serif;
+    padding : 0em;
+    margin : 0em;
+    font-size : 1em;
+}
+
+/* Cette classe met en forme le bloc <p> où le texte est saisi. */
+.texteDoc  {
+    border : 1px solid black;
+    padding : 0.2em;
+    margin : 1em;
+    min-height : 3em;
+    max-height : 20em;
+    overflow-y : auto;
+    outline-style : none;
+    width : 90%;
+    display : inline-block;
+}
+
+/* Les classes pour mettre en forme le texte */
+.gras {  /* mise en gras */
+    font-weight : bold;
+}
+.no_gras {  /* supprime le gras */
+    font-weight : normal;
+}
+.rouge {  /* met en rouge */
+    color : red;
+}
+.no_rouge {  /* supprime le rouge */
+    color : black;  /* c'est la couleur définie dans le doc */
+}
