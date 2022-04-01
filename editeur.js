@@ -318,6 +318,34 @@ const docu = {
                 }
             }
         }
+
+        function rechNoeudTexteAvecCurseur(rng) {
+            /*  Renvoie le noeud texte autour du curseur.
+                rng.startContainer = le noeud autour du curseur
+                Si rng.startContainer est de type texte alors il est renvoyé.
+                Sinon, ce noeud est forcément un élément
+                       rng.startOffset = nb de fils à droite du curseur, depuis le début de rng.startContainer
+                       par conséquent, fils[rng.startOffset] = le noeud juste à gauche du curseur
+                       renvoie le 1er noeud fils de type texte, obtenu en remontant vers la gauche depuis le
+                       curseur. */
+            var i, noeud;
+            if (rng.startContainer.nodeType === 3) {  // le noeud autour du curseur est de type texte
+                return [rng.startContainer, rng.startOffset];  // donc, il est renvoyé
+            }  // sinon rng.startContainer est toujours un élément
+            for (i = rng.startOffset - 1; i > 0; i--) {  // en remontant vers la gauche depuis le curseur
+                if (rng.startContainer.childNodes[i].nodeType === 3) {  // le noeud est de type texte
+                    return [rng.startContainer.childNodes[i], 0];
+                }  // sinon, le noeud est un élément
+                noeud = rng.startContainer.childNodes[i].lastChild;
+                while (noeud) {  // rech le 1er noeud texte en partant de la gauche
+                    if (noeud.nodeType === 3) {  // c'est un noeud texte
+                        return [noeud, 0];  // donc, renvoie ce noeud
+                    }  // sinon, on prend le noeud voisin
+                    noeud = noeud.previousSibling;
+                }
+            }
+        }
+        
         /*  La gestion des ' ' dans le bloc où editable=true :
             Lorsque plusieurs ' ' se succèdent, il y a des ' ' simples avec le code ascii 32, et des espaces insécables
             avec le code ascii 160 (A0 en hexa). Cela implique le début (resp. la fin) du mot est délimité par la plus
@@ -328,19 +356,19 @@ const docu = {
             https://fr.wikipedia.org/wiki/Espace_ins%C3%A9cable
             Si la ligne pourrait contenir le 1er mot, mais pas le 2ème car elle n'est pas assez longue, alors les 2 mots
             seront automatiquement affichés ensemble sur la ligne suivante. */
-        var c, noeudDebut, noeudFin, iDebut, iFin;
-        if (rng.startContainer.nodeType !== 3) {  // le curseur n'est pas sur un texte
-            return;  // donc, il n'y a pas de mot à sélectionner
+        var c, noeudDebut, noeudFin, iDebut, iFin, decalage;
+        [noeudDebut, decalage] = rechNoeudTexteAvecCurseur(rng);
+        if (!noeudDebut) {  // le noeud incluant le curseur n'existe pas
+            return;  // donc, aucun texte n'est sélectionné
         }
-        noeudDebut = rng.startContainer;
         noeudFin = noeudDebut;
-        iDebut = rechDebut(noeudDebut, delim, rng.startOffset);  // rech le début dans le noeud texte incluant le curseur
-        iFin = rechFin(noeudDebut, delim, rng.startOffset);  // rech la fin dans le noeud texte incluant le curseur
+        iDebut = rechDebut(noeudDebut, delim, decalage);  // rech le début dans le noeud texte incluant le curseur
+        iFin = rechFin(noeudDebut, delim, decalage);  // rech la fin dans le noeud texte incluant le curseur
         if (iDebut === -1) {  // la position de début n'existe pas
-            [noeudDebut, iDebut] = rechDebutFinMot(blocDocu, delim, rng.startContainer, rechDebut, "previousSibling");
+            [noeudDebut, iDebut] = rechDebutFinMot(blocDocu, delim, noeudDebut, rechDebut, "previousSibling");
         }
         if (iFin === -1) {  // la position de fin n'existe pas
-            [noeudFin, iFin] = rechDebutFinMot(blocDocu, delim, rng.startContainer, rechFin, "nextSibling");
+            [noeudFin, iFin] = rechDebutFinMot(blocDocu, delim, noeudDebut, rechFin, "nextSibling");
         }
         for (c of delim) {  // si le début est un délimiteur alors il est ignoré
             if (noeudDebut.textContent.startsWith(c, iDebut)) {
