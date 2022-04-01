@@ -79,7 +79,7 @@ const docu = {
         evt.preventDefault();   // annule l'action du navigateur lorsque ce dernier traite aussi le reccourci
         evt.stopPropagation();  // l'évènement n'est pas propagé aux autres éléments html
         var rng = document.getSelection().getRangeAt(0);     // renvoie un objet range à partir de la sélection
-        if (sel.isCollapsed) {  // la zone à mettre en gras est vide
+        if (rng.collapsed) {  // la zone à mettre en gras est vide
             // evt.target = <p>... texte du doc ...</p> = l'evt clavier est survenu sur cet élt
             docu.selectionneMot(evt.target, docu.delimMot, rng);  // surligne le mot
         }
