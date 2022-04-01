@@ -78,11 +78,13 @@ const docu = {
             mais cette méthode me paraît bonne pour atteindre le résultat. */
         evt.preventDefault();   // annule l'action du navigateur lorsque ce dernier traite aussi le reccourci
         evt.stopPropagation();  // l'évènement n'est pas propagé aux autres éléments html
-        var sel = document.getSelection();  // renvoie un objet Selection qui contient le texte sélectionné
-        var rng = sel.getRangeAt(0);     // renvoie un objet range à partir de la sélection
+        var rng = document.getSelection().getRangeAt(0);     // renvoie un objet range à partir de la sélection
         if (sel.isCollapsed) {  // la zone à mettre en gras est vide
             // evt.target = <p>... texte du doc ...</p> = l'evt clavier est survenu sur cet élt
             docu.selectionneMot(evt.target, docu.delimMot, rng);  // surligne le mot
+        }
+        if (!rng.toString().trim())  {  // la sélection est vide
+            return;  // donc, il n'y a pas d'ancre à ajouter au document
         }
         var zone = rng.extractContents();  // la zone est extraite du document (zone est un documentFragment)
         var noeudPrin = document.createElement("span");  // le noeud principal (sa classe est définie plus loin)
@@ -193,6 +195,9 @@ const docu = {
         if (rng.collapsed) {  // la sélection est vide, donc on doit trouver l'url autour du curseur
             // evt.target = <p>... texte du doc ...</p> = l'evt clavier est survenu sur cet élt
             docu.selectionneMot(evt.target, docu.delimURL, rng);  // surligne l'url
+        }
+        if (!rng.toString().trim())  {  // la sélection est vide
+            return;  // donc, il n'y a pas d'ancre à ajouter au document
         }
         // ici, l'url est surlignée (sélectionnée)
         ancre = document.createElement("a");  // l'élt <a>
@@ -323,9 +328,14 @@ const docu = {
             https://fr.wikipedia.org/wiki/Espace_ins%C3%A9cable
             Si la ligne pourrait contenir le 1er mot, mais pas le 2ème car elle n'est pas assez longue, alors les 2 mots
             seront automatiquement affichés ensemble sur la ligne suivante. */
-        var c, noeudDebut = rng.startContainer, noeudFin = noeudDebut;
-        var iDebut = rechDebut(noeudDebut, delim, rng.startOffset);  // rech le début dans le noeud texte incluant le curseur
-        var iFin = rechFin(noeudDebut, delim, rng.startOffset);  // rech la fin dans le noeud texte incluant le curseur
+        var c, noeudDebut, noeudFin, iDebut, iFin;
+        if (rng.startContainer.nodeType !== 3) {  // le curseur n'est pas sur un texte
+            return;  // donc, il n'y a pas de mot à sélectionner
+        }
+        noeudDebut = rng.startContainer;
+        noeudFin = noeudDebut;
+        iDebut = rechDebut(noeudDebut, delim, rng.startOffset);  // rech le début dans le noeud texte incluant le curseur
+        iFin = rechFin(noeudDebut, delim, rng.startOffset);  // rech la fin dans le noeud texte incluant le curseur
         if (iDebut === -1) {  // la position de début n'existe pas
             [noeudDebut, iDebut] = rechDebutFinMot(blocDocu, delim, rng.startContainer, rechDebut, "previousSibling");
         }
