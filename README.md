@@ -8,6 +8,7 @@ CTRL + ALT + g : si l'épaisseur du texte sélectionné est normale alors le tex
 Après avoir sélectionné une URL, la dernière combinaison CTRL + ALT + h ouvre une fenêtre pour saisir un texte, qui sera affiché dans un lien dont la cible est l'URL ; par la suite, ce lien s'ouvrira dans un autre onglet.
 Ces raccourcis clavier sont inactifs s'ils sont déjà définis dans le navigateur.
 Par ailleurs, il existe 2 moyens pour sélectionner du texte : en surlignant la zone, ou **en plaçant le curseur sur le mot ou l'URL**.
+Pour sélectionner le "mot" autour du curseur, il existe la méthode selection.modify() ; néamoins son support n'est pas assuré puisqu'elle n'est pas dans la spécification.
 # Installation
 Il suffit d'enregistrer les fichiers editeur.html, editeur.css, et editeur.js dans le même dossier ; puis, d'ouvrir le premier fichier dans un navigateur.
 L'éditeur devrait fonctionner avec la dernière version de Firefox ou de Chromium.
